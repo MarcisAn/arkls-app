@@ -12,6 +12,7 @@ import session from "express-session";
 import connectRedis from "connect-redis";
 import { __prod__, COOKIE_NAME } from "./constants";
 import cors from "cors";
+import fs from "fs"
 
 async function main() {
     //@ts-ignore
@@ -22,7 +23,9 @@ async function main() {
     //console.log(await orm.em.find(User, {}));
 
     const app = express();
+    //app.use(cors({ origin: "http://localhost:5173", credentials: true }));
     app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+
 
     const RedisStore = connectRedis(session);
 
@@ -46,7 +49,7 @@ async function main() {
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
                 httpOnly: true,
                 sameSite: "lax", // csrf
-                secure: false, // cookie only works in https
+                secure: __prod__, // cookie only works in https
                 domain: __prod__ ? "arkls.lv" : undefined,
             },
             saveUninitialized: false,
@@ -74,6 +77,20 @@ async function main() {
         app,
         cors: false,
     });
+
+    app.get("/pfp",function(req,res) {
+        // @ts-ignore
+        //TODO: iespējams path traversal
+        fs.readFile(process.env.PFP_LOCATION +"/"+ req.query.username+".png", (err,data)=>{
+            if (err) {
+                res.writeHead(404);
+                res.end(JSON.stringify(err));
+                return;
+            }
+            res.writeHead(200);
+            res.end(data);
+        })
+    })
 
     app.listen(4000, () => {
         console.log("server on 4000");

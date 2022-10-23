@@ -1,4 +1,4 @@
-import {Entity, ManyToMany, PrimaryKey, Property} from "@mikro-orm/core";
+import {Collection, Entity, ManyToMany, OneToMany, PrimaryKey, Property} from "@mikro-orm/core";
 import {Field, Int, ObjectType} from "type-graphql";
 
 
@@ -24,23 +24,13 @@ export class User {
     @Property({type: "text", unique: true})
     username!: string;
 
-    @Field(() => String)
-    @Property({type: "text"})
-    firstName!: string;
-
-    @Field(() => String)
-    @Property({type: "text"})
-    lastName!: string;
-
     @Property({type: "text"})
     password!: string;
 
     @Property({type: "int", default: 0})
     tokenVersion: number;
 
-    @Field(() => String, {nullable: true})
-    @Property({type: "date", nullable: true})
-    birthDate: Date;
-
+    @ManyToMany(() => User)
+    friends: Collection<User> = new Collection<User>(this)
 
 }

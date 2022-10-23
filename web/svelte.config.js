@@ -9,6 +9,11 @@ const config = {
 
 	kit: {
 		adapter: adapter()
+	},
+	server: {
+		fsServe: {
+			root: '..'
+		}
 	}
 };
 

@@ -5,22 +5,12 @@ import argon from "argon2";
 import {COOKIE_NAME} from "../constants";
 import {isAuth} from "../middleware/isAuth";
 
-@ObjectType()
-class LoginResponse {
-    @Field(() => User)
-    user: User;
-    @Field(() => [FieldError], {nullable: true})
-    errors?: Error[];
-}
+
 
 @InputType()
 class UsernameEmail {
     @Field()
     username: string;
-    @Field()
-    firstName: string;
-    @Field()
-    lastName: string;
     @Field()
     password: string;
     @Field()
@@ -34,7 +24,13 @@ class UserID {
 }
 
 @InputType()
-class UsernamePasswordInput {
+class UsernameInput {
+    @Field()
+    username: string;
+}
+
+@InputType()
+class EmailPasswordInput {
     @Field()
     password: string;
     @Field()
@@ -49,6 +45,13 @@ class FieldError {
     @Field()
     message: string;
 }
+@ObjectType()
+class LoginResponse {
+    @Field(() => User)
+    user: User;
+    @Field(() => [FieldError], {nullable: true})
+    errors?: Error[];
+}
 
 @ObjectType()
 class UserResponse {
@@ -57,21 +60,17 @@ class UserResponse {
 
     @Field({nullable: true})
     user?: User;
-}
 
-@ObjectType()
-class Test {
-    @Field({nullable: true})
-    res?: string;
+    @Field()
+    isFriend?: boolean;
+
+    @Field()
+    username: string;
 }
 
 @Resolver()
 export class UserResolver {
-    @Query(() => Test, {nullable: true})
-    cav(){
-        return {res: "cav"}
-    }
-        @Query(() => User, {nullable: true})
+    @Query(() => User, {nullable: true})
     me(@Ctx() {req, em}: MyContext) {
         //@ts-ignore
         if (!req.session.userId) {
@@ -81,6 +80,48 @@ export class UserResolver {
         const user = em.findOne(User, {id: req.session.userId})
         console.log(user)
         return user;
+    }
+
+    @UseMiddleware(isAuth)
+    @Mutation(() => Boolean)
+    async addFriend(@Ctx() {req, em}: MyContext,
+                    @Arg("options") options: UsernameInput) {
+        const user = await em.findOne(User, {id: parseInt(options.username)})
+        console.log(user)
+        if (user) {
+            await user.friends.init()
+            //@ts-ignore
+            const owner = await em.findOne(User, {id: req.session.userId})
+            return true;
+        } else {
+            return null;
+        }
+    }
+
+    @UseMiddleware(isAuth)
+    @Query(() => [UserResponse], {nullable: true})
+    async getUsers(@Ctx() {req, em}: MyContext) {
+        //
+
+        //@ts-ignore
+        //if (!req.session.userId) {
+        //    return null;
+        //}
+        //@ts-ignore
+        //let users = await em.findAndCount(User)
+        //console.log(users[0][0].friends)
+        // @ts-ignore
+        const users = await em.find(User, {id: {$ne: req.session.userId}}, {populate: ["friends"]})
+        let filtered_users = [];
+        users.forEach(user => {
+            user.friends.init();
+            ////console.log(user.friends.toArray());
+            // @ts-ignore
+            user = {...user, isFriend: false};
+            //@ts-ignore
+            filtered_users.push(user)
+        })
+        return filtered_users;
     }
 
     @Mutation(() => UserResponse)
@@ -127,8 +168,6 @@ export class UserResolver {
             username: options.username,
             password: hashedPassword,
             email: options.email,
-            firstName: options.firstName,
-            lastName: options.lastName,
         });
         console.log(user);
 
@@ -157,11 +196,12 @@ export class UserResolver {
 
     @Mutation(() => LoginResponse)
     async login(
-        @Arg("options") options: UsernamePasswordInput,
+        @Arg("options") options: EmailPasswordInput,
         @Ctx() {em, req}: MyContext
     ) {
+        console.log(options)
         const user = await em.findOne(User, {email: options.email});
-
+        console.log(user)
         if (!user) {
             return {
                 errors: [
