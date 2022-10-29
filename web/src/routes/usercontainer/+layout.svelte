@@ -38,6 +38,9 @@
         <slot></slot>
     </main>
     <footer>
+        <a href="/usercontainer/addtask">
+            <strong>Pievienot uzdevumu</strong>
+        </a>
         <a href="/usercontainer">
             Kopskats
         </a>

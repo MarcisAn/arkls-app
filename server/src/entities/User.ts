@@ -1,5 +1,6 @@
 import {Collection, Entity, ManyToMany, OneToMany, PrimaryKey, Property} from "@mikro-orm/core";
 import {Field, Int, ObjectType} from "type-graphql";
+import {Task} from "./Task";
 
 
 @ObjectType()
@@ -33,4 +34,7 @@ export class User {
     @ManyToMany(() => User)
     friends: Collection<User> = new Collection<User>(this)
 
+    @Field(() => [Task])
+    @OneToMany(() => Task, task => task.user)
+    tasks = new Collection<Task>(this)
 }

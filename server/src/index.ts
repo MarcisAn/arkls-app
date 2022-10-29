@@ -13,6 +13,7 @@ import connectRedis from "connect-redis";
 import { __prod__, COOKIE_NAME } from "./constants";
 import cors from "cors";
 import fs from "fs"
+import {TaskResolver} from "./resolvers/task";
 
 async function main() {
     //@ts-ignore
@@ -61,7 +62,7 @@ async function main() {
     const em = orm.em;
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver],
+            resolvers: [UserResolver, TaskResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({

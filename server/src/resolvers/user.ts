@@ -38,7 +38,7 @@ class EmailPasswordInput {
 }
 
 @ObjectType()
-class FieldError {
+export class FieldError {
     @Field()
     field: string;
 
@@ -86,12 +86,24 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async addFriend(@Ctx() {req, em}: MyContext,
                     @Arg("options") options: UsernameInput) {
-        const user = await em.findOne(User, {id: parseInt(options.username)})
-        console.log(user)
+        const user = await em.findOne(User, {username: options.username},{populate: ["friends"]})
         if (user) {
-            await user.friends.init()
             //@ts-ignore
-            const owner = await em.findOne(User, {id: req.session.userId})
+            const owner = await em.findOne(User, {id: req.session.userId}, {populate: ["friends"]})
+            if(owner?.friends.contains(user)){
+                owner?.friends.remove(user)
+                // @ts-ignore
+                user?.friends.remove(owner)
+            }
+            else{
+                owner?.friends.add(user)
+                // @ts-ignore
+                user?.friends.add(owner)
+            }
+            // @ts-ignore
+            await em.persistAndFlush(owner)
+            await em.persistAndFlush(user)
+
             return true;
         } else {
             return null;
@@ -101,23 +113,21 @@ export class UserResolver {
     @UseMiddleware(isAuth)
     @Query(() => [UserResponse], {nullable: true})
     async getUsers(@Ctx() {req, em}: MyContext) {
-        //
-
         //@ts-ignore
-        //if (!req.session.userId) {
-        //    return null;
-        //}
-        //@ts-ignore
-        //let users = await em.findAndCount(User)
-        //console.log(users[0][0].friends)
-        // @ts-ignore
         const users = await em.find(User, {id: {$ne: req.session.userId}}, {populate: ["friends"]})
         let filtered_users = [];
         users.forEach(user => {
             user.friends.init();
-            ////console.log(user.friends.toArray());
+            const friends = user.friends.toJSON();
             // @ts-ignore
-            user = {...user, isFriend: false};
+            user = {...user, isFriend: false}
+            friends.forEach(friend => {
+                // @ts-ignore
+                if(friend.id == req.session.userId){
+                    // @ts-ignore
+                    user.isFriend = true
+                }
+            })
             //@ts-ignore
             filtered_users.push(user)
         })

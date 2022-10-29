@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@urql/svelte": "^3.0.1",
 		"graphql": "^16.6.0",
+		"lodash": "^4.17.21",
 		"sass": "^1.55.0"
 	}
 }
