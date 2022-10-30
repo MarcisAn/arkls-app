@@ -24,7 +24,6 @@ async function main() {
     //console.log(await orm.em.find(User, {}));
 
     const app = express();
-    //app.use(cors({ origin: "http://localhost:5173", credentials: true }));
     app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 
@@ -83,6 +82,19 @@ async function main() {
         // @ts-ignore
         //TODO: iespējams path traversal
         fs.readFile(process.env.PFP_LOCATION +"/"+ req.query.username+".png", (err,data)=>{
+            if (err) {
+                res.writeHead(404);
+                res.end(JSON.stringify(err));
+                return;
+            }
+            res.writeHead(200);
+            res.end(data);
+        })
+    })
+    app.get("/taskpic",function(req,res) {
+        // @ts-ignore
+        //TODO: iespējams path traversal
+        fs.readFile(process.env.TASKPIC_LOCATION +"/"+ req.query.id+".png", (err,data)=>{
             if (err) {
                 res.writeHead(404);
                 res.end(JSON.stringify(err));

@@ -1,5 +1,5 @@
 <script>
-    import {createClient, gql, setContextClient} from "@urql/svelte";
+    import {createClient, getContextClient, gql, queryStore, setContextClient} from "@urql/svelte";
     import {goto} from '$app/navigation';
 
     const client = createClient({
@@ -20,6 +20,17 @@
             logout
         }
       `
+        const todos = queryStore({
+            client: client,
+            query: gql`
+      query {
+        todos {
+          id
+          title
+        }
+      }
+    `,
+        });
         client.mutation(MUT).toPromise().then(res => {
             if (res.data.logout == true) {
                 goto("/")
@@ -28,11 +39,10 @@
     };
 </script>
 
-
 <div class="usercontainer">
     <header>
-        <h1>arkls</h1>
-        <button on:click={loginMut}>logout</button>
+        <img src="/header.png" alt="">
+        <button on:click={loginMut}>Iziet</button>
     </header>
     <main>
         <slot></slot>
@@ -66,6 +76,27 @@
     flex-direction: column;
 
     header {
+      display: flex;
+
+      @media only screen and (max-width: 600px) {
+        flex-direction: column;
+      }
+      flex-direction: row;
+      justify-content: space-between;
+
+      button {
+        width: 100px;
+        background-color: #FFAD01;
+        border: none;
+        margin: 10px;
+        font-size: xx-large;
+      }
+
+      img {
+        object-fit: contain;
+        height: 70px;
+      }
+
       background-color: #a1a1a1;
     }
 
@@ -76,10 +107,14 @@
     footer {
       background-color: #ff9757;
       display: flex;
-      height: 5%;
+      @media only screen and (max-width: 600px) {
+        flex-direction: column;
+      }
+      text-align: center;
       justify-content: space-around;
 
       a {
+        border-bottom: 1px solid black;
         text-decoration: none;
         color: black;
         font-size: 20px;

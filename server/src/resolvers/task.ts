@@ -61,12 +61,16 @@ export class TaskResolver {
     @Query(() => TaskResponse)
     async getTask(@Ctx() {req, em}: MyContext, @Arg("options") options: PostIDInput) {
         const task = await em.findOne(Task, {id: parseInt(options.id)})
+
         // @ts-ignore
         const user = await em.findOne(User, {id: req.session.userId}, {populate: ["friends"]})
         // @ts-ignore
         await task.user.friends.init()
+        //@ts-ignore
+        console.log(task)
+
         // @ts-ignore
-        if (task.user.friends.contains(user)) {
+        if (task.user.friends.contains(user) || task.user.id == user?.id) {
             return {task: task};
         } else {
             return {

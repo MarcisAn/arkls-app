@@ -111,6 +111,25 @@ export class UserResolver {
     }
 
     @UseMiddleware(isAuth)
+    @Query(() => Boolean)
+    async isFriend(@Ctx() {req, em}: MyContext,
+                   @Arg("options") options: UsernameInput){
+        //@ts-ignore
+        const owner = await em.find(User, {id: req.session.userId}, {populate: ["friends"]})
+        const user = await em.find(User, {username: options.username}, {populate: ["friends"]})
+        if(owner.friends.contains(user)){
+            return true;
+        }
+        else{
+            return false
+        }
+        //@ts-ignore
+        if (owner.id == user.id){
+            return null
+        }
+    }
+
+    @UseMiddleware(isAuth)
     @Query(() => [UserResponse], {nullable: true})
     async getUsers(@Ctx() {req, em}: MyContext) {
         //@ts-ignore

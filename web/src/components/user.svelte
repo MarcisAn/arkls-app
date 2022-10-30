@@ -1,12 +1,38 @@
 <script>
     import {getContextClient, gql} from "@urql/svelte";
-    import {goto} from "$app/navigation";
 
     export let username = "";
     export let isFriend = false;
+    let isSelf = false;
 
     const handleError = ev => ev.target.src = "http://localhost:5173/assets/defaultPFP.png"
     const client = getContextClient()
+    if (isFriend == null) {
+        const isFriendQ = gql`
+        query($username:String!) {
+            isFriend(options: {
+                username: $username
+            }
+            )
+        }
+      `
+        client.query(isFriendQ, {
+            username: username
+        }).toPromise().then(res => {
+            if (res.data) {
+                if (res.data.isFriend) {
+                    isFriend = true;
+                } else {
+                    isFriend = false;
+                }
+            }
+            if (res.data == null) {
+                isSelf = true;
+            }
+
+
+        })
+    }
 
     function addFriend() {
         const MUT = gql`
@@ -15,8 +41,7 @@
         }
       `
         client.mutation(MUT, {username: username}).toPromise().then(res => {
-            if(res.data.addFriend){
-                console.log("veiksmigi")
+            if (res.data.addFriend) {
                 isFriend = !isFriend;
             }
         })
@@ -27,7 +52,9 @@
 <div class={"userCard"} class:selected={isFriend}>
     <img src={"http://localhost:4000/pfp?username=" + username} alt="" on:error={handleError}>
     <p>{username}</p>
-    <button on:click={() => addFriend()}>{isFriend ? "Pārtraukt draudzēties":"Draudzēties"}</button>
+    {#if !isSelf}
+        <button on:click={() => addFriend()}>{isFriend ? "Pārtraukt draudzēties" : "Draudzēties"}</button>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -55,8 +82,9 @@
       margin-left: auto;
     }
   }
-  .selected{
-    background-color: #0077ff;
+
+  .selected {
+    background-color: #34638F;
   }
 
 

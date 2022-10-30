@@ -27,4 +27,8 @@ export class Comment {
     @ManyToOne(() => Task)
     task: Task
 
+    @Field(() => String)
+    @Property()
+    text: string
+
 }
