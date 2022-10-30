@@ -6,8 +6,9 @@
         url: 'http://174.138.8.115/graphql',
         fetchOptions: () => {
             return {
-                credentials: "include",
                 cache: "no-cache"
+                ,
+                credentials: "include"
             };
         },
     });
