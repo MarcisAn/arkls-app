@@ -67,10 +67,26 @@
         id: 0,
         category: ""
     })
-    function categoryName(name){
-        switch (name){
+
+    function categoryName(name) {
+        switch (name) {
             case "school":
-                return "Skola"
+                return ["Skola", "#4a8137"]
+                break;
+            case "sports":
+                return ["Sports", "#3773b7"]
+                break;
+            case "pulcini":
+                return ["Pulciņi", "#c44545"]
+                break;
+            case "hobbies":
+                return ["Hobiji", "#c57b2f"]
+                break;
+            case "projects":
+                return ["Projekti", "#6ed9d9"]
+                break;
+            case "other":
+                return ["Cits", "#e0a05d"]
                 break;
         }
     }
@@ -81,17 +97,71 @@
     <h1>{$task.title}</h1>
 
     <User username={$task.username} isFriend={null}/>
-    <div class="taskInfo">
-        <p>{$task.points}</p>
-        <p>{$task.category}</p>
-    </div>
-    <img src={"http://localhost:4000/taskpic?id=" + $task.id} alt="Task picture">
+    {#if $task.id}
+        <div class="taskInfo">
+            <div class="points">
+                TUPEŅI
+                <span>
+                    {$task.points}
+                </span>
+            </div>
+            <div class="category">
+                KATEGORIJA:
+                <span style={"background-color: "+ categoryName($task.category)[1]}>{categoryName($task.category)[0]}</span>
+            </div>
+        </div>
+        <div class="taskImage">
+            <img src={"http://localhost:4000/taskpic?id=" + $task.id} alt="Task picture">
+
+        </div>
+        <div class="comments">
+            <h2>Komentāri:</h2>
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
   .task {
     .taskInfo {
-      background-color: #3C3084;
+      margin-top: 1em;
+      .points {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #244564;
+
+        span {
+          margin-left: 10px;
+          padding: 10px;
+          color: black;
+          background-color: white;
+        }
+
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .category {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #244564;
+
+        span {
+          margin-left: 10px;
+          padding: 10px;
+          color: black;
+        }
+
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
     }
 
     margin: 1em;
@@ -107,6 +177,12 @@
 
     h1 {
       font-size: xx-large;
+    }
+
+    .taskImage {
+      margin-top: 1em;
+      display: flex;
+      justify-items: center;
     }
 
     .userCard {

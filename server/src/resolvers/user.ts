@@ -117,6 +117,7 @@ export class UserResolver {
         //@ts-ignore
         const owner = await em.find(User, {id: req.session.userId}, {populate: ["friends"]})
         const user = await em.find(User, {username: options.username}, {populate: ["friends"]})
+        //@ts-ignore
         if(owner.friends.contains(user)){
             return true;
         }
