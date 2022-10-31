@@ -50,7 +50,7 @@
 </script>
 
 <div class={"userCard"} class:selected={isFriend}>
-    <img src={"http://localhost:4000/pfp?username=" + username} alt="" on:error={handleError}>
+    <img src={"https://arkls-api.cvgmerch.lv/pfp?username=" + username} alt="" on:error={handleError}>
     <p>{username}</p>
     {#if !isSelf}
         <button on:click={() => addFriend()}>{isFriend ? "Pārtraukt draudzēties" : "Draudzēties"}</button>

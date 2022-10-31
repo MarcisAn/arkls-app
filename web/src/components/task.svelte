@@ -111,7 +111,7 @@
             </div>
         </div>
         <div class="taskImage">
-            <img src={"http://localhost:4000/taskpic?id=" + $task.id} alt="Task picture">
+            <img src={"https://arkls-api.cvgmerch.lv/taskpic?id=" + $task.id} alt="Task picture">
 
         </div>
         <div class="comments">
