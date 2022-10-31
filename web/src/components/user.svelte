@@ -1,11 +1,11 @@
 <script>
     import {getContextClient, gql} from "@urql/svelte";
-
+    import { dev } from '$app/environment';
     export let username = "";
     export let isFriend = false;
     let isSelf = false;
 
-    const handleError = ev => ev.target.src = "http://localhost:5173/assets/defaultPFP.png"
+    const handleError = ev => ev.target.src = "/assets/defaultPFP.png"
     const client = getContextClient()
     if (isFriend == null) {
         const isFriendQ = gql`
@@ -50,7 +50,12 @@
 </script>
 
 <div class={"userCard"} class:selected={isFriend}>
-    <img src={"https://arkls-api.cvgmerch.lv/pfp?username=" + username} alt="" on:error={handleError}>
+    {#if dev}
+        <img src={"http://localhost:4000/pfp?username=" + username} alt="" on:error={handleError}>
+    {/if}
+    {#if !dev}
+        <img src={"https://arkls-api.cvgmerch.lv/pfp?username=" + username} alt="" on:error={handleError}>
+    {/if}
     <p>{username}</p>
     {#if !isSelf}
         <button on:click={() => addFriend()}>{isFriend ? "Pārtraukt draudzēties" : "Draudzēties"}</button>

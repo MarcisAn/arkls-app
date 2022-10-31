@@ -2,6 +2,7 @@
     import {getContextClient, gql} from '@urql/svelte';
     import {writable} from 'svelte/store';
     import User from "./user.svelte"
+    import {dev} from "$app/environment";
 
     export let id = 0;
     const client = getContextClient()
@@ -111,8 +112,12 @@
             </div>
         </div>
         <div class="taskImage">
-            <img src={"https://arkls-api.cvgmerch.lv/taskpic?id=" + $task.id} alt="Task picture">
-
+            {#if dev}
+                <img src={"http://localhost:4000/taskpic?id=" + $task.id} alt="">
+            {/if}
+            {#if !dev}
+                <img src={"https://arkls-api.cvgmerch.lv/taskpic?id=" + $task.id} alt="">
+            {/if}
         </div>
         <div class="comments">
             <h2>Komentāri:</h2>

@@ -3,7 +3,7 @@
     import {getContextClient, gql} from "@urql/svelte";
     import {goto} from "$app/navigation";
 
-    let category = "school";
+    let category = "";
     export const task = writable({
         title: "",
         hours: 0
