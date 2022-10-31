@@ -3,7 +3,7 @@
     import {createClient, getContextClient, gql, queryStore, setContextClient} from '@urql/svelte';
 
     const client = createClient({
-        url: 'http://174.138.8.115/graphql',
+        url: 'https://arkls-api.cvgmerch.lv/graphql',
         fetchOptions: () => {
             return {
                 credentials: "include",

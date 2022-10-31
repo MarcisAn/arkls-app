@@ -3,7 +3,7 @@
     import {goto} from '$app/navigation';
 
     const client = createClient({
-        url: 'http://174.138.8.115/graphql',
+        url: 'https://arkls-api.cvgmerch.lv/graphql',
         fetchOptions: () => {
             return {
                 cache: "no-cache"
